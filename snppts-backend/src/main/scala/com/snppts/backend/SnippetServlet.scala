@@ -1,16 +1,13 @@
 package com.snppts.backend
 
 import org.scalatra._
+import org.scalatra.json._
+import org.json4s.jackson.JsonMethods._
 
 class SnippetServlet extends SnpptsbackendStack {
 
   get("/") {
-    <html>
-      <body>
-        <h1>Hello, world!</h1>
-        Say <a href="hello-scalate">hello to Scalate</a>.
-      </body>
-    </html>
+    compact(render(parse(""" { "abbreviation" : "_test" } """)))
   }
 
 }
