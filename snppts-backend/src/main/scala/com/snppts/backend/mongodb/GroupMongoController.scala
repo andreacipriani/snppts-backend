@@ -3,34 +3,47 @@ package com.snppts.backend
 import org.scalatra._
 import com.mongodb.casbah.Imports._
 
-class GroupMongoController(mongoColl: MongoCollection) extends ScalatraServlet {
+class GroupMongoController(mongoCollection: MongoCollection) extends ScalatraServlet {
 
   /**
-   * Insert a new object into the database. You can use the following from your console to try it out:
-   * curl -i -H "Accept: application/json" -X POST -d "name=The1stgroupever" http://localhost:8080/group
+   * Insert a new group into the database.
+   * curl -i -H "Accept: application/json" -X POST -d "name=Ale" http://localhost:8080/api/v1/group
    */
+
   post("/") {
     val name = params("name")
-    val group = MongoDBObject("name" -> name)
-    mongoColl += group
+    val maxGroupId = mongoMaxGroupId() + 1
+    val group = MongoDBObject("group_id" -> maxGroupId, "name" -> name)
+    mongoCollection += group
+  }
+
+  def mongoMaxGroupId() : Int = {
+    val fields = MongoDBObject("group_id" -> 1)
+    val orderByAsc = -1
+    val orderBy = MongoDBObject("group_id" -> orderByAsc)
+    val result = mongoCollection.findOne(fields = fields, orderBy = orderBy)
+    val group = result.get.getAs[Int]("group_id").get
+    return group
   }
 
   /**
-   * Retrieve everything in the MongoDb collection we're currently using.
-   http://localhost:8080/mongo/
+   * Get all the groups
+   http://localhost:8080/api/v1/mongo/
    */
+
   get("/") {
-    mongoColl.find()
-    for { x <- mongoColl} yield x
+    mongoCollection.find()
+    for { x <- mongoCollection} yield x
   }
 
   /**
-   * Query for the first object which matches the values given. If you copy/pasted the insert example above,
-   * try http://localhost:8080/mongo/query/super/duper in your browser.
+   * Get a group from its id
    */
-  get("/query/:key/:value") {
-    val q = MongoDBObject(params("key") -> params("value"))
-    for ( x <- mongoColl.findOne(q) ) yield x
+
+  get("/query/:group_id") {
+    val groupId = params("group_id")
+    val query = MongoDBObject("group_id" -> groupId)
+    for ( x <- mongoCollection.findOne(query) ) yield x
   }
 
 }
