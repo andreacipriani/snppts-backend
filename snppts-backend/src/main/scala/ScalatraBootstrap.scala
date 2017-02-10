@@ -8,9 +8,10 @@ class ScalatraBootstrap extends LifeCycle {
     //context.mount(new HelloServlet, "/")
     context.mount(new SnippetController, "/snippet")
 
-    
     val mongoClient =  MongoClient()
-    val mongoColl = mongoClient("casbah_test")("test_data")
+    val databaseName = "snpptsdb"
+    val tableName = "snppts"
+    val mongoColl = mongoClient(databaseName)(tableName)
     context.mount(new MongoController(mongoColl), "/mongo")
   }
 }
