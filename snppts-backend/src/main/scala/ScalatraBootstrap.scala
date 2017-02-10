@@ -5,13 +5,16 @@ import com.mongodb.casbah.Imports._
 
 class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {
-    //context.mount(new HelloServlet, "/")
-    context.mount(new SnippetController, "/snippet")
+
+    context.mount(new SnippetController, "/snippettest")
 
     val mongoClient =  MongoClient()
     val databaseName = "snpptsdb"
-    val tableName = "snppts"
-    val mongoColl = mongoClient(databaseName)(tableName)
-    context.mount(new MongoController(mongoColl), "/mongo")
+
+    val groupsMongoClient = mongoClient(databaseName)("group")
+    context.mount(new GroupMongoController(groupsMongoClient), "/group")
+
+    val snippetsMongoClient = mongoClient(databaseName)("snippet")
+    context.mount(new MongoController(snippetsMongoClient), "/snippet")
   }
 }
