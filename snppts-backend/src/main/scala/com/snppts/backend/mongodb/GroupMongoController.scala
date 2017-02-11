@@ -2,6 +2,7 @@ package com.snppts.backend
 
 import org.scalatra._
 import com.mongodb.casbah.Imports._
+import scala.util.control.Exception._
 
 class GroupMongoController(mongoCollection: MongoCollection) extends ScalatraServlet {
 
@@ -34,7 +35,7 @@ val groupId = "group_id"
 
   /**
    * Get all the groups
-   http://localhost:8080/api/v1/mongo/
+  http://localhost:8080/api/v1/group/
    */
 
   get("/") {
@@ -44,10 +45,12 @@ val groupId = "group_id"
 
   /**
    * Get a group from its id
+  http://localhost:8080/api/v1/group/1
    */
 
-  get("/query/:group_id") {
-    val query = MongoDBObject(groupId -> params(groupId))
+  get("/:group_id") {
+    val optGroupId = catching(classOf[NumberFormatException]) opt params(groupId).toInt
+    val query = MongoDBObject(groupId -> optGroupId)
     for ( x <- mongoCollection.findOne(query) ) yield x
   }
 
